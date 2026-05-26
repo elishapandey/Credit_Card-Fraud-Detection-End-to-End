@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fraud Detection Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, #7928CA, transparent 35%),
+                radial-gradient(circle at bottom right, #ff0080, transparent 35%),
+                linear-gradient(135deg, #0f172a, #1e293b);
+
+            color: white;
+            padding: 30px;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1450px;
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #ff4ecd;
+        }
+
+        .status-box {
+            padding: 12px 22px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            font-size: 15px;
+        }
+
+        /* MAIN GRID */
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 25px;
+        }
+
+        /* CARD */
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        /* LEFT PANEL */
+
+        .hero-title {
+            font-size: 42px;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero-title span {
+            color: #ff4ecd;
+        }
+
+        .hero-description {
+            color: #d1d5db;
+            line-height: 1.8;
+            margin-bottom: 35px;
+            font-size: 16px;
+        }
+
+        /* STATS */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-box h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .stat-box p {
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        /* FORM */
+
+        .form-title {
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .input-box input,
+        .input-box select {
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            transition: 0.3s;
+        }
+
+        .input-box input::placeholder {
+            color: #d1d5db;
+        }
+
+        .input-box select option {
+            color: black;
+        }
+
+        .input-box input:focus,
+        .input-box select:focus {
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 0 15px rgba(255, 78, 205, 0.4);
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* BUTTON */
+
+        .predict-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ff0080, #7928CA);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 0, 128, 0.4);
+        }
+
+        /* RIGHT PANEL */
+
+        .side-title {
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .risk-meter {
+            margin-bottom: 35px;
+        }
+
+        .risk-bar {
+            width: 100%;
+            height: 18px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .risk-fill {
+            width: 75%;
+            height: 100%;
+            background: linear-gradient(90deg,#22c55e,#facc15,#ef4444);
+        }
+
+        .activity-box {
+            background: rgba(255,255,255,0.07);
+            padding: 18px;
+            border-radius: 18px;
+            margin-bottom: 18px;
+        }
+
+        .activity-box h4 {
+            margin-bottom: 10px;
+        }
+
+        .activity-box p {
+            color: #d1d5db;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* RESULT */
+
+        .prediction-text {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .prediction-text pre {
+            color: white;
+            white-space: pre-wrap;
+            font-size: 17px;
+            line-height: 1.8;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        /* MOBILE */
+
+        @media(max-width:1100px) {
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:700px) {
+
+            .form-grid,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: span 1;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <!-- HEADER -->
+        <div class="top-bar">
+
+            <div class="logo">
+                Fraud<span>Shield AI</span>
+            </div>
+
+            <div class="status-box">
+                🟢 System Active | AI Monitoring Enabled
+            </div>
+
+        </div>
+
+        <!-- MAIN -->
+        <div class="main-grid">
+
+            <!-- LEFT SIDE -->
+            <div class="card">
+
+                <h1 class="hero-title">
+                    Smart AI Powered <span>Fraud Detection</span>
+                </h1>
+
+                <p class="hero-description">
+                    Detect suspicious credit card transactions in real-time
+                    using Machine Learning, intelligent behavioral analysis,
+                    and advanced fraud risk monitoring.
+                </p>
+
+                <!-- STATS -->
+                <div class="stats-grid">
+
+                    <div class="stat-box">
+                        <h2>99.5%</h2>
+                        <p>Model Accuracy</p>
+                    </div>
+
+                    <div class="stat-box">
+                        <h2>24/7</h2>
+                        <p>Live Monitoring</p>
+                    </div>
+
+                    <div class="stat-box">
+                        <h2>AI</h2>
+                        <p>Risk Analysis</p>
+                    </div>
+
+                </div>
+
+                <!-- FORM -->
+                <h2 class="form-title">
+                    Transaction Analysis
+                </h2>
+
+                <form action="/predict" method="POST">
+
+                    <div class="form-grid">
+
+                        <div class="input-box">
+                            <input type="text" name="transaction_id" placeholder="Transaction ID" required>
+                        </div>
+
+                        <div class="input-box">
+                            <input type="text" name="amount" placeholder="Transaction Amount" required>
+                        </div>
+
+                        <div class="input-box">
+                            <input type="text" name="transaction_hour" placeholder="Transaction Hour" required>
+                        </div>
+
+                        <div class="input-box">
+
+                            <select name="merchant_category" required>
+
+                                <option value="">Select Merchant Category</option>
+
+                                <option value="Grocery">Grocery</option>
+
+                                <option value="Electronics">Electronics</option>
+
+                                <option value="Travel">Travel</option>
+
+                                <option value="Fashion">Fashion</option>
+
+                                <option value="Restaurant">Restaurant</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="input-box">
+                            <input type="text" name="foreign_transaction"
+                                placeholder="Foreign Transaction (0 or 1)" required>
+                        </div>
+
+                      <div class="input-box">
+                       <select name="unusual_location" required>
+
+    <option value="">Is this an unusual transaction location?</option>
+
+    <option value="0">No</option>
+
+    <option value="1">Yes</option>
+
+</select>
+</div>
+
+                     <div class="input-box">
+
+    <select name="new_device" required>
+
+        <option value="">New Device?</option>
+
+        <option value="Yes">Yes</option>
+
+        <option value="No">No</option>
+
+    </select>
+
+</div>
+
+<div class="input-box">
+
+    <select name="vpn_used" required>
+
+        <option value="">VPN Used?</option>
+
+        <option value="Yes">Yes</option>
+
+        <option value="No">No</option>
+
+    </select>
+
+</div>
+
+
+
+<div class="input-box">
+
+    <select name="same_location" required>
+
+        <option value="">Same Location as Previous?</option>
+
+        <option value="Yes">Yes</option>
+
+        <option value="No">No</option>
+
+    </select>
+
+</div>
+
+<div class="input-box">
+
+  <input type="number"
+       name="successful_transactions"
+       placeholder="Successful Transactions in Last 30 Days"
+       min="0"
+       required>
+
+</div>
+
+                        <div class="input-box">
+                            <input type="text" name="velocity_last_24h"
+                                placeholder="Velocity Last 24 Hours" required>
+                        </div>
+
+                        <div class="input-box">
+
+                            <input type="number"
+                                name="cardholder_age"
+                                placeholder="Cardholder Age"
+                                min="18"
+                                max="100"
+                                required>
+
+                        </div>
+
+                        <div class="full-width">
+                            <button class="predict-btn" type="submit">
+                                🔍 Predict Transaction
+                            </button>
+                        </div>
+
+                    </div>
+
+                </form>
+
+                
+               <div class="prediction-output">
+    {{ prediction_text | safe }}
+</div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="card">
+
+                <h2 class="side-title">
+                    📊 Fraud Intelligence Dashboard
+                </h2>
+
+                <!-- RISK METER -->
+                <div class="risk-meter">
+
+                    <h3>Current Fraud Risk Level</h3>
+
+                    <div class="risk-bar">
+
+                        <div class="risk-fill"></div>
+
+                    </div>
+
+                </div>
+
+                <!-- ACTIVITY -->
+                <div class="activity-box">
+
+                    <h4>⚠ High Risk Indicators</h4>
+
+                    <p>
+                        Foreign transactions, unusual spending patterns,
+                        rapid transaction velocity, and low trust devices
+                        are automatically flagged by the AI system.
+                    </p>
+
+                </div>
+
+                <div class="activity-box">
+
+                    <h4>🛡 AI Security Engine</h4>
+
+                    <p>
+                        Machine Learning models continuously analyze
+                        transaction behavior patterns to identify fraud
+                        attempts in milliseconds.
+                    </p>
+
+                </div>
+
+                <div class="activity-box">
+
+                    <h4>📈 Live Fraud Analytics</h4>
+
+                    <p>
+                        Real-time monitoring helps banks and financial
+                        institutions reduce financial losses and improve
+                        transaction security.
+                    </p>
+
+                </div>
+
+                <div class="activity-box">
+
+                    <h4>🚨 Smart Alert System</h4>
+
+                    <p>
+                        Transactions with abnormal behavior receive
+                        elevated fraud risk scores and trigger
+                        instant detection alerts.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            Built with Flask • Machine Learning • Random Forest • AI Security
+        </div>
+
+    </div>
+
+</body>
+
+</html>
