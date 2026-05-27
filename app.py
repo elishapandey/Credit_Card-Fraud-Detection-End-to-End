@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import pandas as pd
-import pickle
+import joblib
 
 # =====================================================
 # CREATE FLASK APP
@@ -12,9 +12,8 @@ app = Flask(__name__)
 # LOAD MODEL & PREPROCESSOR
 # =====================================================
 
-model = pickle.load(open("model.pkl", "rb"))
-
-preprocessor = pickle.load(open("preprocessor.pkl", "rb"))
+model = joblib.load("model.pkl")
+preprocessor = joblib.load("preprocessor.pkl")
 
 # =====================================================
 # HOME ROUTE
